@@ -14,41 +14,71 @@
 
 package com.hashan.silva.contact.controller;
 
-import com.hashan.silva.contact.util.EndpointNamingUtil;
+import com.hashan.silva.contact.domain.Contact;
+import com.hashan.silva.contact.service.ContactService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public class ContactControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @Mock
+    ContactService contactService;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @InjectMocks
+    ContactController contactController;
 
     @Test
     public void getContactsCountTest() throws MalformedURLException {
-        ResponseEntity<Long> response = restTemplate.getForEntity(new URL("http://localhost:" + port + EndpointNamingUtil.CONTACT + "/" + EndpointNamingUtil.COUNT).toString(), Long.class);
-        assertEquals(478, response.getBody());
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        Mockito.when(contactService.getContactsCount()).thenReturn(Long.valueOf(350));
+
+        Long responseEntity = contactController.getContactsCount();
+
+        Assertions.assertEquals(350, responseEntity);
+
     }
 
     @Test
     public void getContactsTest() throws MalformedURLException {
-        ResponseEntity<List> response = restTemplate.getForEntity(new URL("http://localhost:" + port + EndpointNamingUtil.CONTACT).toString(), List.class);
-        assertTrue(!response.getBody().isEmpty());
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        List<Contact> contacts = this.getContacts();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        Mockito.when(contactService.getContacts(anyString(), anyInt(), anyInt())).thenReturn(contacts);
+
+        List<Contact> responseEntity = contactController.getContacts("",10,0);
+
+        Assertions.assertEquals(contacts.size(), responseEntity.size());
+        assertTrue(!responseEntity.isEmpty());
+    }
+
+    private List<Contact> getContacts() {
+        List<Contact> contactsList = new ArrayList<>();
+        Contact contact1 = new Contact();
+        contact1.setName("Test1");
+        contact1.setUrl("test_url1");
+        Contact contact2 = new Contact();
+        contact2.setName("Test2");
+        contact2.setUrl("test_url2");
+        contactsList.add(contact1);
+        contactsList.add(contact2);
+        return contactsList;
     }
 }
