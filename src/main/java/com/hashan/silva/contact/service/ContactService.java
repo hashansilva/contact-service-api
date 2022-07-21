@@ -40,7 +40,11 @@ public class ContactService {
      */
     public List<Contact> getContacts(String name, int limit, int page) {
         Pageable pageable = PageRequest.of(page, limit);
-        return this.contactRepository.findByNameContainingIgnoreCase(name, pageable);
+        if (name != null && name.length() > 0) {
+            return this.contactRepository.findByNameContainingIgnoreCase(name, pageable);
+        }
+        return this.contactRepository.findAll(pageable).toList();
+
     }
 
     /**
