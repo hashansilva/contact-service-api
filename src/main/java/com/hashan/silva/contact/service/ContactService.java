@@ -16,6 +16,7 @@ package com.hashan.silva.contact.service;
 
 import com.hashan.silva.contact.domain.Contact;
 import com.hashan.silva.contact.repository.ContactRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,8 @@ import java.util.List;
 
 @Service
 public class ContactService {
-    private final ContactRepository contactRepository;
-
-    public ContactService(ContactRepository contactRepository) {
-        this.contactRepository = contactRepository;
-    }
+    @Autowired
+    private ContactRepository contactRepository;
 
     /**
      * Get Contacts
