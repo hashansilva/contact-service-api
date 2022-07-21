@@ -16,8 +16,8 @@ package com.hashan.silva.contact.controller;
 
 import com.hashan.silva.contact.domain.Contact;
 import com.hashan.silva.contact.service.ContactService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,13 +25,10 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-public class ContactController {
+public class ContactController implements IContactController {
 
-    private final ContactService contactService;
-
-    public ContactController(ContactService contactService) {
-        this.contactService = contactService;
-    }
+    @Autowired
+    private ContactService contactService;
 
     /**
      * Search Contact Lists
@@ -41,10 +38,11 @@ public class ContactController {
      * @param page
      * @return
      */
-    @GetMapping("/contacts")
-    public List<Contact> getContacts(@RequestParam(required = false) String name,
-                                     @RequestParam(required = false) Integer limit,
-                                     @RequestParam(required = false) Integer page) {
+    @Override
+    public List<Contact> getContacts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false, defaultValue = "10") Integer limit,
+            @RequestParam(required = false, defaultValue = "0") Integer page) {
         return this.contactService.getContacts(name, limit, page);
     }
 
@@ -53,7 +51,7 @@ public class ContactController {
      *
      * @return
      */
-    @GetMapping("/contacts/count")
+    @Override
     public Long getContactsCount() {
         return this.contactService.getContactsCount();
     }
