@@ -22,6 +22,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -71,8 +73,9 @@ public class ContactServiceTest {
     @Test
     public void getContactsTest_withoutName() {
         List<Contact> contacts = getContacts(null);
-        Mockito.when(contactRepository.findByNameContainingIgnoreCase(anyString(), any(Pageable.class))).thenReturn(contacts);
-        assertEquals(contacts.size(), contactService.getContacts("Test1", 10, 0).size());
+        Page<Contact> contactPage = new PageImpl<>(contacts);
+        Mockito.when(contactRepository.findAll(any(Pageable.class))).thenReturn(contactPage);
+        assertEquals(contacts.size(), contactService.getContacts(null, 10, 0).size());
     }
 
     private List<Contact> getContacts(String test) {

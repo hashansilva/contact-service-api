@@ -41,7 +41,7 @@ public class ContactService {
         if (name != null && name.length() > 0) {
             return this.contactRepository.findByNameContainingIgnoreCase(name, pageable);
         }
-        return this.contactRepository.findAll(pageable).toList();
+        return this.contactRepository.findAll(pageable).getContent();
 
     }
 
